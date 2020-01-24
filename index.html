@@ -1,0 +1,86 @@
+<!-- Styles -->
+<style>
+#chartdiv {
+  width: 50%;
+  height: 500px;
+}
+</style>
+
+<!-- Resources -->
+<script src="https://www.amcharts.com/lib/4/core.js"></script>
+<script src="https://www.amcharts.com/lib/4/charts.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+
+
+<!-- Chart code -->
+<script>
+
+// Themes begin
+function show_plot(char_data){
+  am4core.useTheme(am4themes_animated);
+  // Themes end
+
+  chart = am4core.create("chartdiv", am4charts.ChordDiagram);
+  chart.hiddenState.properties.opacity = 0;
+
+  chart.data = char_data;
+
+  chart.dataFields.fromName = "from";
+  chart.dataFields.toName = "to";
+  chart.dataFields.value = "value";
+
+  // make nodes draggable
+  var nodeTemplate = chart.nodes.template;
+  nodeTemplate.readerTitle = "Click to show/hide or drag to rearrange";
+  nodeTemplate.showSystemTooltip = true;
+  nodeTemplate.cursorOverStyle = am4core.MouseCursorStyle.pointer
+
+
+}
+
+
+
+function parse_data() {
+
+  var char_data = [];
+
+  var data_to_parse = document.getElementById("myTextarea").value;
+
+  data_to_parse = data_to_parse.replace(/(\r\n|\n|\r)/gm, "");
+  var partsOfStr = data_to_parse.split(';');
+
+  for (var i = 0; i < partsOfStr.length; i++) {
+
+    var this_connection = partsOfStr[i].split(',')
+
+    if( this_connection.length ==3 ){
+
+      char_data.push( {   from: this_connection[0] , to: this_connection[1] , value: Number(this_connection[2]) }  )
+    }
+
+  }
+
+
+  show_plot(char_data);
+
+}
+
+
+
+
+
+</script>
+
+
+<!-- HTML -->
+<h5>Insert your graph related data as:</h5>
+<p>from,to,value;from,to,value;...</p>
+<textarea id="myTextarea" rows="4" cols="50">
+Hippocampus,Amygdala,10;Entrohinal,Hippocampus,7;PFC,Hippocampus,2;PFC,Thalamus,4;Thalamus,Hippocampus,4;</textarea>
+<br>
+<button type="button" onclick="parse_data()">Plot it</button>
+<br>
+<div id="chartdiv"></div>
